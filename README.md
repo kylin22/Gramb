@@ -1,4 +1,9 @@
 <h1 style="text-align:center;">Discord Gambling Bot</h1>
+<p>
+  <a href="https://discord.gg/sZejhUMp">
+    <img src="https://img.shields.io/badge/join%20us-black?style=for-the-badge&logo=discord&logoColor=white">
+  </a>
+</p>
 
 ## Features
 
