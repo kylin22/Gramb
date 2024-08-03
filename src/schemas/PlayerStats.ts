@@ -3,7 +3,6 @@ import Item from "../classes/Item";
 import itemsMap from "../config/items";
 import { Flags } from "../classes/Flags";
 import Region from "../classes/Region";
-import { GrankStats } from "./Grank";
 
 interface IPlayerStats extends Document {
   userId: string;
@@ -20,9 +19,9 @@ interface IPlayerStatsModel extends Model<IPlayerStats> {
   getStats(userId: string): Promise<IPlayerStats | null>;
   updateStats(userId: string, CPChange: number): Promise<boolean | undefined>;
   updateRegion(userId: string, region: Region): void;
-  updateInventory(userId: string, itemId: string, itemChange: number): void;
+  updateInventory(userId: string, itemId: string, itemChange: number): Promise<void>;
   getAllStats(): Promise<IPlayerStats[] | null>;
-  updateFlag(userId: string, flag: Flags, value: boolean): void;
+  updateFlag(userId: string, flag: Flags, value: boolean): Promise<void>;
 }
 
 const emptyResourceObject = Item.initializeResourceQuantities(itemsMap);
@@ -87,7 +86,7 @@ PlayerStats.createWithDefaults = async function(userId: string) {
 
 PlayerStats.updateStats = async function(userId: string, CPChange: number) {
   const now = new Date();
-  const userStats = await GrankStats.getStats(userId);
+  const userStats = await PlayerStats.getStats(userId);
   if (!userStats) {
     console.error(`Attempted to access non-existent or broken playerStats for ${userId} (CPChange: ${CPChange})`);
     return;

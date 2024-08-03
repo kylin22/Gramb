@@ -1,9 +1,10 @@
 import { SlashCommandBuilder, ChannelType, TextChannel, EmbedBuilder, MessageComponentInteraction, messageLink, GuildMember } from "discord.js"
-import { getThemeColor, getPlayerStats } from "../utils/util";
+import { getThemeColor } from "../utils/util";
 import { GrankStats } from "../schemas/Grank";
 import { SlashCommand } from "../types";
 import regions from "../config/regions";
 import { Flags } from "../classes/Flags";
+import { PlayerStats } from "../schemas/PlayerStats";
 
 
 const command : SlashCommand = {
@@ -12,7 +13,7 @@ const command : SlashCommand = {
     .setDescription("View your grambling stats."),
     execute: async (interaction) => {
         try {
-            const playerStats = await getPlayerStats(interaction.member!.user.id);
+            const playerStats = await PlayerStats.getStats(interaction.member!.user.id);
 
             if (!playerStats) {
                 await interaction.reply({
@@ -46,6 +47,7 @@ const command : SlashCommand = {
 
             let commands = "placeholder";
 
+            //TODO emojis for currencies
             let currencies = `${playerStats.CP} CP ${debt}`;
             if (playerStats.flags[Flags.CXUnlocked]) {
                 currencies += `\n${playerStats.CX} CX`;

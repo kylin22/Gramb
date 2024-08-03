@@ -1,9 +1,7 @@
 import { SlashCommandBuilder, ChannelType, TextChannel, EmbedBuilder, MessageComponentInteraction, messageLink, GuildMember } from "discord.js"
-import { getThemeColor, getPlayerStats, getAllPlayerStats } from "../utils/util";
+import { getThemeColor } from "../utils/util";
 import { SlashCommand } from "../types";
-import itemsMap from "../config/items";
-import Item from "../classes/Item";
-import { Tier } from "../classes/Tiers";
+import { PlayerStats } from "../schemas/PlayerStats";
 
 const command : SlashCommand = {
     command: new SlashCommandBuilder()
@@ -11,7 +9,7 @@ const command : SlashCommand = {
     .setDescription("View the leaderboard."),
     execute: async (interaction) => {
         try {
-            const allPlayerStats = await getAllPlayerStats();
+            const allPlayerStats = await PlayerStats.getAllStats();
             if (!allPlayerStats) {
                 await interaction.reply({
                     content: "Failed to get player stats." //TODO calculate leaderboard placement based on assests including debt and inventory
@@ -34,7 +32,7 @@ const command : SlashCommand = {
                 ]
             });
         } catch (error) {
-            console.error(`Failed to handle leaderboard command: ${error.message}`);
+            console.error(`Failed to handle leaderboard command: ${error.stack}`);
             await interaction.reply({ content: "Ping me if you see this.", ephemeral: true });
         }
     },

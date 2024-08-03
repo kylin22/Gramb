@@ -1,9 +1,10 @@
 import { SlashCommandBuilder, ChannelType, TextChannel, EmbedBuilder, MessageComponentInteraction, messageLink, GuildMember } from "discord.js"
-import { getThemeColor, getPlayerStats } from "../utils/util";
+import { getThemeColor } from "../utils/util";
 import { SlashCommand } from "../types";
 import itemsMap from "../config/items";
 import Item from "../classes/Item";
-import { Tier } from "../classes/Tiers";
+import { Tier, Tiers } from "../classes/Tiers";
+import { PlayerStats } from "../schemas/PlayerStats";
 
 const command : SlashCommand = {
     command: new SlashCommandBuilder()
@@ -11,7 +12,7 @@ const command : SlashCommand = {
     .setDescription("View your inventory."),
     execute: async (interaction) => {
         try {
-            const playerStats = await getPlayerStats(interaction.member!.user.id);
+            const playerStats = await PlayerStats.getStats(interaction.member!.user.id);
 
             if (!playerStats) {
                 await interaction.reply({
@@ -32,21 +33,22 @@ const command : SlashCommand = {
             activeResources = Tier.sortTiers(activeResources);
 
             let description = "";
+            let mythicSeperatorLineFlag = false;
             activeResources.forEach((item) => {
-                description += `[[${item.tier}]] **${item.name}**: ${playerStats.resources[item.id]}\n`
+                const emoji = Tier.tierEmoji[item.tier];
+                description += `> ${emoji} **${item.name}**: ${playerStats.resources[item.id]}\n`
+                if (!mythicSeperatorLineFlag && Tier.tiersSort[item.tier] >= Tier.tiersSort[Tiers.Mythic]) {
+                    description += `\n### Mythic+\n\n`
+                    mythicSeperatorLineFlag = true;
+                }
             });
 
-            interaction.reply({
-                embeds: [
-                    new EmbedBuilder()
-                    .setTitle("Inventory")
-                    .setDescription(description)
-                    .setAuthor({ name: interaction.member!.user.username, iconURL: interaction.user.displayAvatarURL() })
-                    .setColor(getThemeColor("text"))
-                ]
-            });
+            
+            interaction.reply(`
+                ## ${interaction.member!.user.username}'s Inventory \n\n
+                ${description}`);
         } catch (error) {
-            console.error(`Failed to handle inventory command: ${error.message}`);
+            console.error(`Failed to handle inventory command: ${error.stack}`);
             await interaction.reply({ content: "Ping me if you see this.", ephemeral: true });
         }
     },

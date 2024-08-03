@@ -3,13 +3,13 @@ import { Tiers } from "../classes/Tiers";
 import { Currencies } from "../classes/Currencies";
 
 const items = [
-    new Item("grass", "Stone", Tiers.Common, 
-        "A verdant, soft plant, covering the Chasm floors in lush patches, used in crafting for its flexibility and as a key ingredient in various natural remedies and lightweight armors.", 
-        "https://i.postimg.cc/7Y81Rmm9/Common-Rocks.png",
-        { currency: Currencies.CP, amount: 1 }),
     new Item("stone", "Stone", Tiers.Common, 
         "A rugged gray mineral, ubiquitous in the depths, used in construction for its durability and as a basic crafting material for various essential tools and structures.", 
         "https://i.postimg.cc/7Y81Rmm9/Common-Rocks.png", 
+        { currency: Currencies.CP, amount: 1 }),
+    new Item("grass", "Grass", Tiers.Common, 
+        "A verdant, soft plant, covering the Chasm floors in lush patches, used in crafting for its flexibility and as a key ingredient in various natural remedies and lightweight armors.", 
+        "https://i.postimg.cc/7Y81Rmm9/Common-Rocks.png",
         { currency: Currencies.CP, amount: 1 }),
     new Item("coal", "Coal", Tiers.Common, 
         "This dense, black mineral is scattered throughout the depths. Known for its high combustibility, coal is essential for fueling forges and creating powerful explosives. It also serves as a crucial component in crafting various industrial tools and equipment.", 

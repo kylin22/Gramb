@@ -3,6 +3,7 @@ import Item from "./Item";
 
 export default class ResourcePool {
     private entries: {item: Item, weight: number}[] = [];
+    public displayChances: {[itemId: string]: number} = {};
     private accumulatedWeight = 0.0;
 
     public addEntry(itemId: string, weight: number) {
@@ -11,6 +12,8 @@ export default class ResourcePool {
             console.error(`Could not find item ${itemId}`);
             return;
         }
+
+        this.displayChances[foundItem.id] = weight;
         this.accumulatedWeight += 1 / weight;
         this.entries.push({ item: foundItem, weight: this.accumulatedWeight });
     }

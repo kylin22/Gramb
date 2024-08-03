@@ -2,7 +2,7 @@ import { SlashCommandBuilder, ChannelType, TextChannel, EmbedBuilder, MessageCom
 import { SlashCommand } from "../types";
 import regions from "../config/regions";
 import resourcePools from "../config/resourcePools";
-import { Tier } from "../classes/Tiers";
+import { Tier, Tiers } from "../classes/Tiers";
 import { Flags } from "../classes/Flags";
 import { PlayerStats } from "../schemas/PlayerStats";
 
@@ -45,17 +45,17 @@ const command : SlashCommand = {
             await PlayerStats.updateInventory(playerStats.userId, randomItem.id, 1);
 
             //unlock CX if Legendary or higher item found
-            if (!playerStats.flags[Flags.CXUnlocked] && Tier.tiersSort[randomItem.tier] >= Tier.tiersSort["Legendary"]) {
+            if (!playerStats.flags[Flags.CXUnlocked] && Tier.tiersSort[randomItem.tier] >= Tier.tiersSort[Tiers.Legendary]) {
                 await PlayerStats.updateFlag(playerStats.userId, Flags.CXUnlocked, true);
             }
 
             interaction.reply({
                 embeds: [
                     new EmbedBuilder()
-                    .setTitle(randomItem.name)
-                    .setDescription(`<@${interaction.member!.user.id}> found ${randomItem.name}!`)
+                    .setTitle(`${randomItem.name}`)
+                    .setDescription(`<@${interaction.member!.user.id}> found **${randomItem.name}!**`)
                     .setColor(Tier.getTierColor(randomItem.tier)!)
-                    .setFields({ name: randomItem.tier, value: randomItem.description })
+                    .setFields({ name: `${randomItem.tier} (${currentRegionResources.displayChances[randomItem.id]})`, value: randomItem.description })
                     .setImage(randomItem.image)
                     .setTimestamp()
                 ]

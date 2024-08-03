@@ -30,17 +30,27 @@ class Tier {
         "Legendary": 4,
         "Mythic": 5,
         "Exotic": 6
-    };
+    }
 
     private static readonly TierColors: { [tier in keyof typeof Tiers]: RGBTuple } = {
-        [Tiers.Common]: [128, 128, 128], // Gray
-        [Tiers.Uncommon]: [255, 0, 0], // Red
-        [Tiers.Rare]: [0, 128, 255], // Blue
-        [Tiers.Epic]: [128, 0, 255], // Purple
-        [Tiers.Legendary]: [255, 128, 0], // Orange
-        [Tiers.Mythic]: [255, 0, 255], // Magenta
-        [Tiers.Exotic]: [255, 255, 0] // Yellow
-    };
+        [Tiers.Common]: [255, 255, 255],
+        [Tiers.Uncommon]: [176, 252, 108],
+        [Tiers.Rare]: [88, 156, 204],
+        [Tiers.Epic]: [104, 76, 204],
+        [Tiers.Legendary]: [256, 196, 76],
+        [Tiers.Mythic]: [256, 68, 148],
+        [Tiers.Exotic]: [256, 4, 4]
+    }
+
+    public static readonly tierEmoji: {[tier in keyof typeof Tiers]: string} = {
+        [Tiers.Common]: "<:common:1269283882071625820>",
+        [Tiers.Uncommon]: "<:uncommon:1269283906755231837>",
+        [Tiers.Rare]: "<:rare:1269283923066880074>",
+        [Tiers.Epic]: "<:epic:1269283935838539776>",
+        [Tiers.Legendary]: "<:legendary:1269283947465019483>",
+        [Tiers.Mythic]: "<:mythic:1269283960509173861>",
+        [Tiers.Exotic]: "<:exotic:1269283972442226771>"
+    }
 
     public static getTierColor(tier: keyof typeof Tiers): RGBTuple | undefined {
         return Tier.TierColors[tier];
