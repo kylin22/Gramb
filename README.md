@@ -11,9 +11,11 @@
 
 ## Features
 
-* Gambling
+* gambling
 * CP (crab points, not to be confused with ***** ****)
 * artificial rarity
 * endless grinding
 * dopamine
 * suffering
+
+I am mentally sane
