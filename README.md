@@ -3,6 +3,7 @@
   <a href="https://discord.gg/sZejhUMp">
     <img src="https://img.shields.io/badge/join%20us-black?style=for-the-badge&logo=discord&logoColor=white">
   </a>
+  <br>
   <a href="https://github.com/gramb/releases">
     <img src="https://img.shields.io/badge/-latest%20release-black?style=for-the-badge&logo=github">
   </a>
