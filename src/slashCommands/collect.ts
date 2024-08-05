@@ -56,7 +56,7 @@ const command : SlashCommand = {
                     .setDescription(`<@${interaction.member!.user.id}> found **${randomItem.name}!**`)
                     .setColor(Tier.getTierColor(randomItem.tier)!)
                     .setFields({ name: `${randomItem.tier} (${currentRegionResources.displayChances[randomItem.id]})`, value: randomItem.description })
-                    .setImage(randomItem.image)
+                    //.setImage(randomItem.image) //waiting for hugo
                     .setTimestamp()
                 ]
             });

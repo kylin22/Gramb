@@ -18,4 +18,17 @@ readdirSync(handlersDir).forEach(handler => {
 });
 
 client.login(process.env.TOKEN);
-//TODO set up github version control
+
+import ShopSimulation from "./classes/ShopSimulation";
+import { ShopStats } from "./schemas/Shop";
+client.once('ready', async () => {
+    const mainShop = await ShopStats.getStats("mineEntranceShop");
+    if (!mainShop) {
+        return;
+    }
+    const shopSimulation = new ShopSimulation(mainShop);
+
+    setInterval(async () => {
+        await shopSimulation.simulateStep();
+    }, 60000);
+});

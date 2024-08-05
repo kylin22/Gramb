@@ -70,7 +70,7 @@ const command : SlashCommand = {
             interaction.reply({
                 embeds: [
                     new EmbedBuilder()
-                    .setTitle("Grank Information")
+                    .setTitle("Grank")
                     .setDescription(`Welcome to the Grank <@${interaction.member!.user.id}>\n\n**Current Balance: ${grankStats.CP}CP**\n**Loan Interest: ${loanInterestPercentage}**`)
                     .setAuthor({ name: interaction.member!.user.username, iconURL: interaction.user.displayAvatarURL() })
                     .setImage(currentRegion.image) //TODO grank sprite

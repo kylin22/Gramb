@@ -4,7 +4,9 @@ import { SlashCommand } from "../types";
 import regions from "../config/regions";
 import { ShopStats } from "../schemas/Shop";
 import { PlayerStats } from "../schemas/PlayerStats";
-
+import Item from "../classes/Item";
+import itemsMap from "../config/items";
+import { Tier, Tiers } from "../classes/Tiers";
 
 const command : SlashCommand = {
     command: new SlashCommandBuilder()
@@ -39,16 +41,31 @@ const command : SlashCommand = {
                 return;
             }
 
-            interaction.reply({
-                embeds: [
-                    new EmbedBuilder()
-                    .setTitle("Shop Information")
-                    .setDescription(`Welcome to the Shop <@${interaction.member!.user.id}>`)
-                    .setAuthor({ name: interaction.member!.user.username, iconURL: interaction.user.displayAvatarURL() })
-                    .setImage(currentRegion.image) //TODO shop sprite
-                    .setColor(getThemeColor("text"))
-                ]
+            let activeResources: Item[] = [];
+            //TODO create pages if exceeding limit
+
+            Object.entries(playerStats.resources).forEach(([itemId, quantity]) => {
+                if (quantity > 0) {
+                    activeResources.push(itemsMap.get(itemId)!);
+                }
             });
+            activeResources = Tier.sortTiers(activeResources);
+
+            let description = "";
+            activeResources.forEach((item) => {
+                const emoji = Tier.tierEmoji[item.tier];
+                const prices = shopStats.price[item.id].sellPrice;
+                let priceDescription = "";
+                //TODO implement multiple currencies
+                Object.entries(prices).forEach(([currency, price]) => {
+                    priceDescription += `${price.toFixed(2)} ${currency}`;
+                });
+                description += `> ${emoji} **${item.name}** (${playerStats.resources[item.id]}): ${priceDescription}\n`
+            });
+            
+            interaction.reply(
+                `## __Shop__\n\nWelcome to the Shop <@${interaction.member!.user.id}>\nuse /shop_sell to sell items\n### Sell >>>\n${description}`
+            );
         } catch (error) {
             console.error(`Failed to handle grank command: ${error.stack}`);
             await interaction.reply({ content: "Ping me if you see this.", ephemeral: true });

@@ -13,6 +13,7 @@ interface IShopStats extends Document {
 interface IShopStatsModel extends Model<IShopStats> {
   createWithDefaults(shopId: string): Promise<boolean | null>;
   getStats(shopId: string): Promise<IShopStats | null>;
+  updateStats(shopId: string, prices: Prices): Promise<void>;
 }
 
 const ShopStatsSchema = new Schema({
@@ -52,8 +53,31 @@ ShopStats.getStats = async function(shopId: string) {
     const shopStats = await ShopStats.findOne({ shopId });
     return shopStats ? shopStats.toObject() : null;
   } catch (error) {
-    console.error(`Failed to retrieve grank stats for grank ${shopId}: ${error.stack}`);
+    console.error(`Failed to retrieve shop stats for grank ${shopId}: ${error.stack}`);
     return null;
+  }
+}
+
+ShopStats.updateStats = async function(shopId: string, prices: { [itemId: string]: { sellPrice: Prices } }) {
+  const shopStats = await ShopStats.getStats(shopId);
+  if (!shopStats) {
+    console.error(`Attempted to access non-existent or broken shopStats for ${shopId}`);
+    return;
+  }
+
+  console.log(prices);
+
+  try {
+    await ShopStats.updateOne(
+      { shopId },
+      { 
+        $set: { 
+            price: prices, 
+        }
+      }
+    );
+  } catch (error) {
+    console.error(`Failed to update CP for shop ${shopId}: ${error.stack}`);
   }
 }
 
