@@ -71,7 +71,7 @@ const command : SlashCommand = {
                 ]
             });
         } catch (error) {
-            console.error(`Failed to handle gramble command: ${error.stack}`);
+            console.error(`Failed to handle info command: ${error.stack}`);
             await interaction.reply({ content: "Ping me if you see this.", ephemeral: true });
         }
     },

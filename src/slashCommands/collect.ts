@@ -5,11 +5,12 @@ import resourcePools from "../config/resourcePools";
 import { Tier, Tiers } from "../classes/Tiers";
 import { Flags } from "../classes/Flags";
 import { PlayerStats } from "../schemas/PlayerStats";
+import { Currencies } from "../classes/Currencies";
 
 const command : SlashCommand = {
     command: new SlashCommandBuilder()
     .setName("collect")
-    .setDescription("Costs 1CP | Collect resources from the current region"),
+    .setDescription("Costs 1CP | Collect resources from the current region."),
     execute: async (interaction) => {
         try {
             const playerStats = await PlayerStats.getStats(interaction.member!.user.id);
@@ -34,7 +35,7 @@ const command : SlashCommand = {
                 return;
             }
 
-            const validCPChange = await PlayerStats.updateStats(playerStats.userId, -1);
+            const validCPChange = await PlayerStats.updateStats(playerStats.userId, -1, Currencies.CP);
             if (!validCPChange) {
                 await interaction.reply({
                     content: "haha poverty"

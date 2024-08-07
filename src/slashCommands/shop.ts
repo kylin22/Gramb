@@ -12,7 +12,7 @@ import { Currencies, Prices } from "../classes/Currencies";
 const command : SlashCommand = {
     command: new SlashCommandBuilder()
     .setName("shop")
-    .setDescription("Visit the local Shop"),
+    .setDescription("Visit the local Shop."),
     execute: async (interaction) => {
         try {
             const playerStats = await PlayerStats.getStats(interaction.member!.user.id);
@@ -72,9 +72,10 @@ const command : SlashCommand = {
                 Object.entries(prices).forEach(([currency, price]) => {
                     const AverageLastPrices = averagePriceHistory(currency, shopStats.history[item.id].sellPrice, 2);
                     if (AverageLastPrices) {
-                        let percentageChange = ((price - AverageLastPrices) / AverageLastPrices).toFixed(3);
-                        console.log(percentageChange);
-                        percentageChange.startsWith("-") ? percentageChange : "+" + percentageChange;
+                        let percentageChange = (((price - AverageLastPrices) / AverageLastPrices) * 100).toFixed(2);
+                        if (!percentageChange.startsWith("-")) {
+                            percentageChange = "+" + percentageChange;
+                        }
                         fluctuationDescription += `(${percentageChange}%)`
                     }
                     priceDescription += `${price.toFixed(2)} ${currency}`;

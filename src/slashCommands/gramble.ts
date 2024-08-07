@@ -7,7 +7,7 @@ import { PlayerStats } from "../schemas/PlayerStats";
 const command : SlashCommand = {
     command: new SlashCommandBuilder()
     .setName("gramble")
-    .setDescription("Start your grambling journey"),
+    .setDescription("Start your grambling journey."),
     execute: async (interaction) => {
         try {
             if (!interaction.member) {

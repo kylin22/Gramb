@@ -6,6 +6,7 @@ import Region from "../classes/Region";
 import regions from "../config/regions";
 import { channel } from "diagnostics_channel";
 import { PlayerStats } from "../schemas/PlayerStats";
+import { Currencies } from "../classes/Currencies";
 
 console.log(require('discord.js').version);
 
@@ -42,7 +43,7 @@ const createRegionSelectMenu = (regionOptions: StringSelectMenuOptionBuilder[]) 
 const command : SlashCommand = {
     command: new SlashCommandBuilder()
     .setName("region")
-    .setDescription("Check or change your current region"),
+    .setDescription("Check or change your current region."),
     execute: async (interaction) => {
         try {
             const playerStats = await PlayerStats.getStats(interaction.member!.user.id);
@@ -83,7 +84,7 @@ const command : SlashCommand = {
                         return;
                     }
 
-                    const validCPChange = await PlayerStats.updateStats(playerStats.userId, -loadedRegions.regionTravelPrices[`${foundRegion.id}`]);
+                    const validCPChange = await PlayerStats.updateStats(playerStats.userId, -loadedRegions.regionTravelPrices[`${foundRegion.id}`], Currencies.CP);
 
                     if (!validCPChange) {
                         confirmation.deferUpdate();

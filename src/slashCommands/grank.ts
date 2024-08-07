@@ -9,7 +9,7 @@ import { PlayerStats } from "../schemas/PlayerStats";
 const command : SlashCommand = {
     command: new SlashCommandBuilder()
     .setName("grank")
-    .setDescription("Visit the local Grank"),
+    .setDescription("Visit the local Grank."),
     execute: async (interaction) => {
         try {
             const playerStats = await PlayerStats.getStats(interaction.member!.user.id);
@@ -73,7 +73,7 @@ const command : SlashCommand = {
                     .setTitle("Grank")
                     .setDescription(`Welcome to the Grank <@${interaction.member!.user.id}>\n\n**Current Balance: ${grankStats.CP}CP**\n**Loan Interest: ${loanInterestPercentage}**`)
                     .setAuthor({ name: interaction.member!.user.username, iconURL: interaction.user.displayAvatarURL() })
-                    .setImage(currentRegion.image) //TODO grank sprite
+                    .setImage(currentRegion.grankImage!)
                     .setColor(getThemeColor("text"))
                     .addFields(
                         { name: "Debt Ledger", value: `${debtLedgerDisplay}`}

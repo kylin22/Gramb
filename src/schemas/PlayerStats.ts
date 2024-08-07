@@ -3,6 +3,7 @@ import Item from "../classes/Item";
 import itemsMap from "../config/items";
 import { Flags } from "../classes/Flags";
 import Region from "../classes/Region";
+import { Currencies } from "../classes/Currencies";
 
 interface IPlayerStats extends Document {
   userId: string;
@@ -17,7 +18,7 @@ interface IPlayerStats extends Document {
 interface IPlayerStatsModel extends Model<IPlayerStats> {
   createWithDefaults(userId: string): Promise<boolean | null>;
   getStats(userId: string): Promise<IPlayerStats | null>;
-  updateStats(userId: string, CPChange: number): Promise<boolean | undefined>;
+  updateStats(userId: string, currencyChange: number, currency: Currencies): Promise<boolean | undefined>;
   updateRegion(userId: string, region: Region): void;
   updateInventory(userId: string, itemId: string, itemChange: number): Promise<void>;
   getAllStats(): Promise<IPlayerStats[] | null>;
@@ -84,22 +85,23 @@ PlayerStats.createWithDefaults = async function(userId: string) {
   }
 }
 
-PlayerStats.updateStats = async function(userId: string, CPChange: number) {
+PlayerStats.updateStats = async function(userId: string, currencyChange: number, currency: Currencies) {
   const now = new Date();
   const userStats = await PlayerStats.getStats(userId);
   if (!userStats) {
-    console.error(`Attempted to access non-existent or broken playerStats for ${userId} (CPChange: ${CPChange})`);
+    console.error(`Attempted to access non-existent or broken playerStats for ${userId} (${currency} change: ${currencyChange})`);
     return;
   }
 
-  if (userStats.CP + CPChange < 0) {
+  if (userStats[currency] + currencyChange < 0) {
     return false;
   }
+  
   try {
     await PlayerStats.updateOne(
       { userId },
       { 
-        $inc: { CP: CPChange }, 
+        $inc: { [currency]: currencyChange }, 
         $set: { 
             lastUpdated: now, 
         }
@@ -108,7 +110,7 @@ PlayerStats.updateStats = async function(userId: string, CPChange: number) {
 
     return true;
   } catch (error) {
-    console.error(`Failed to update CP for user ${userId}: ${error.stack}`);
+    console.error(`Failed to update ${currency} for user ${userId}: ${error.stack}`);
   }
 }
 

@@ -8,7 +8,7 @@ import { PlayerStats } from "../schemas/PlayerStats";
 const command : SlashCommand = {
     command: new SlashCommandBuilder()
     .setName("grank_repay")
-    .setDescription("Repay a Grank loan")
+    .setDescription("Repay a Grank loan.")
     .addIntegerOption(option => option
         .setName("amount")
         .setDescription("Amount of CP to repay")
@@ -70,7 +70,7 @@ const command : SlashCommand = {
                     .setTitle("Repayment")
                     .setDescription(`<@${interaction.member!.user.id}> has repaid ${repayAmount} CP of their loan \n\n **New Balance**: ${playerStats.CP - repayAmount} CP`)
                     .setAuthor({ name: interaction.member!.user.username, iconURL: interaction.user.displayAvatarURL() })
-                    .setImage(currentRegion.image) //TODO grank sprite
+                    .setImage(currentRegion.grankImage!)
                     .setColor(getThemeColor("text"))
                     .setTimestamp()
                 ]

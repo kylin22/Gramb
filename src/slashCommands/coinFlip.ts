@@ -1,14 +1,13 @@
 import { SlashCommandBuilder, SlashCommandOptionsOnlyBuilder, ChannelType, TextChannel, EmbedBuilder, MessageComponentInteraction, messageLink, GuildMember } from "discord.js"
 import { PlayerStats } from "../schemas/PlayerStats";
 import { SlashCommand } from "../types";
-import regions from "../config/regions";
-import { title } from "process";
 import { getThemeColor } from "../utils/util";
+import { Currencies } from "../classes/Currencies";
 
 const command : SlashCommand = {
     command: new SlashCommandBuilder()
     .setName("coin_flip")
-    .setDescription("All or nothing")
+    .setDescription("Double or nothing.")
     .addStringOption(option => option
         .setName("choice")
         .setDescription("Heads or tails")
@@ -57,14 +56,15 @@ const command : SlashCommand = {
 
             if (choice === randomOutcome) {
                 CPChange = bet;
-                description = `**You win ${bet}CP**`;
+                description = `**You win ${bet} CP**`;
             } else {
                 // User loses
                 CPChange = -bet;
-                description = `**You lose ${bet}CP**`;
+                description = `**You lose ${bet} CP**`;
             }
+            description += `\n\n **New Balance**: ${playerStats.CP + CPChange} CP`
 
-            await PlayerStats.updateStats(playerStats.userId, CPChange);
+            await PlayerStats.updateStats(playerStats.userId, CPChange, Currencies.CP);
 
             interaction.reply({
                 embeds: [
