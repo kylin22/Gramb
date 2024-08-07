@@ -21,7 +21,7 @@ const chasmResourcePool = createResourcePool(
     ["palladium", 680],
     //Rare
     ["luminarium", 2300],
-    ["obsidian", 2300],
+    ["voidstone", 2300],
     ["aetherflux", 4500],
     ["cadmium", 4750],
     ["platinum", 6700],

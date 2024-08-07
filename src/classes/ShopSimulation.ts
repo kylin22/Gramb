@@ -11,40 +11,35 @@ interface ShopItem {
 }
 
 export default class ShopSimulation {
-    private historyWindow: number[];
-    private historyWindowSize: number;
+    private historyWindow: { [itemId: string]: { sellPrice: Prices[] } };
     private items: ShopItem[] = [];
     private shop: IShopStats;
     
     constructor(shop: IShopStats) {
+        const VOLATILITY_PERCENTAGE = 30;
+        const REVERSION_PERCENTAGE = 20;
         this.shop = shop;
+        this.historyWindow = shop.history;
         //bug in constructor
         for (const itemId in shop.price) {
             for (const currency of Object.values(Currencies)) {
                 let itemPrice = 0;
-                if (currency in Object.keys(shop.price[itemId].sellPrice)) {
+                if (Object.keys(shop.price[itemId].sellPrice).includes(currency.toString())) {
                     itemPrice = shop.price[itemId].sellPrice[currency]!;
+
+                    const newItem: ShopItem = { 
+                        id: itemId, 
+                        currencyType: currency, 
+                        initialPrice: itemPrice, 
+                        price: itemPrice, 
+                        volatility: itemPrice / VOLATILITY_PERCENTAGE, 
+                        meanReversionSpeed: itemPrice / REVERSION_PERCENTAGE 
+                    };
+                    
+                    this.items.push(newItem);
                 }
-
-                const newItem: ShopItem = { 
-                    id: itemId, 
-                    currencyType: currency, 
-                    initialPrice: itemPrice, 
-                    price: itemPrice, 
-                    volatility: itemPrice / 20, 
-                    meanReversionSpeed: itemPrice / 50 
-                };
-
-                this.items.push(newItem);
             }
         }
-        this.items.forEach(element => {
-            console.log(element);
-        });
-        
-
-        this.historyWindow = [];
-        this.historyWindowSize = 10;
     }
 
     async simulateStep() {
@@ -53,32 +48,28 @@ export default class ShopSimulation {
             const direction = Math.random() > 0.5 ? 1 : -1;
             let magnitude = Math.random() * shopItem.volatility;
             let potentialNewPrice = shopItem.price + (direction * magnitude);
-    
+
             const VARIANCE = 0.5;
             if (potentialNewPrice < shopItem.initialPrice * VARIANCE) {
                 magnitude = (shopItem.initialPrice * VARIANCE - shopItem.price);
             } else if (potentialNewPrice > shopItem.initialPrice * (VARIANCE + 1)) {
                 magnitude = (shopItem.initialPrice * (VARIANCE + 1) - shopItem.price);
             }
-    
+        
             shopItem.price += direction * magnitude;
-            this.updateHistoryWindow(shopItem.price);
             //mean reversion
-            const movingAverage = this.calculateMovingAverage();
-            if (Math.abs(shopItem.price - movingAverage) > shopItem.meanReversionSpeed) {
-                const adjustment = shopItem.meanReversionSpeed * (movingAverage - shopItem.price);
-                shopItem.price += adjustment;
+            const movingAverage = this.calculateMovingAverage(shopItem);
+            const deviationThreshold = shopItem.meanReversionSpeed;
+            if (Math.abs(shopItem.price - movingAverage) > deviationThreshold) {
+                const adjustmentAmount = deviationThreshold * (shopItem.price - movingAverage) / Math.abs(shopItem.price - movingAverage);
+                shopItem.price -= adjustmentAmount;
             }
-            //ensure price stays within bounds after adjustment
-            shopItem.price = Math.max(shopItem.initialPrice * VARIANCE, Math.min(shopItem.price, shopItem.initialPrice * (VARIANCE + 1)));
 
             nextItems.push(shopItem);
-            console.log(`${shopItem.currencyType}: ${shopItem.initialPrice}`);
         }
 
         const convertItemsToPrices = (shopItems: ShopItem[]) => {
             let prices: { [itemId: string]: { sellPrice: Prices } } = {};
-            
             //TODO doesn't handle duplicate objects
             shopItems.forEach(item => {
                 prices[item.id] = { sellPrice: { [item.currencyType]: item.price } }
@@ -90,18 +81,8 @@ export default class ShopSimulation {
         await ShopStats.updateStats(this.shop.shopId, convertItemsToPrices(nextItems));
     }
 
-    updateHistoryWindow(newPrice: number): void {
-        this.historyWindow.unshift(newPrice);
-        if (this.historyWindow.length > this.historyWindowSize) {
-            this.historyWindow.pop();
-        }
-    }
-
-    calculateMovingAverage(): number {
-        return this.historyWindow.reduce((acc, curr) => acc + curr, 0) / this.historyWindow.length;
-    }
-
-    getPriceHistory(): number[] {
-        return [...this.historyWindow];
+    //doesnt handle multiple currencies
+    calculateMovingAverage(shopItem: ShopItem): number {
+        return this.historyWindow[shopItem.id].sellPrice.reduce((acc, curr) => acc + curr[shopItem.currencyType]!, 0) / this.historyWindow[shopItem.id].sellPrice.length;
     }
 }

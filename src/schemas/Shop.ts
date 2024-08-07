@@ -4,10 +4,17 @@ import itemsMap from "../config/items";
 import { Prices } from "../classes/Currencies";
 
 let defaultPrices = Item.initializeResourcePrices(itemsMap);
+let defaultHistory: { [itemId: string]: { sellPrice: Prices[] } } = {};
+for (const itemId in defaultPrices) {
+  defaultHistory[itemId] = {
+      sellPrice: [defaultPrices[itemId].sellPrice]
+  };
+}
 
 interface IShopStats extends Document {
   shopId: string;
   price: { [itemId: string]: { sellPrice: Prices } };
+  history: { [itemId: string]: { sellPrice: Prices[] } };
 }
 
 interface IShopStatsModel extends Model<IShopStats> {
@@ -24,6 +31,10 @@ const ShopStatsSchema = new Schema({
   price: {
     type: Object,
     default: defaultPrices,
+  },
+  history: {
+    type: Object,
+    default: defaultHistory,
   }
 }, { minimize: false });
 
@@ -59,13 +70,21 @@ ShopStats.getStats = async function(shopId: string) {
 }
 
 ShopStats.updateStats = async function(shopId: string, prices: { [itemId: string]: { sellPrice: Prices } }) {
+  const HISTORY_WINDOW_SIZE = 10;
+
   const shopStats = await ShopStats.getStats(shopId);
   if (!shopStats) {
     console.error(`Attempted to access non-existent or broken shopStats for ${shopId}`);
     return;
   }
 
-  console.log(prices);
+  let updatedHistory = shopStats.history;
+  for (const itemId in defaultPrices) {
+    updatedHistory[itemId].sellPrice.unshift(prices[itemId].sellPrice);
+    if (updatedHistory[itemId].sellPrice.length > HISTORY_WINDOW_SIZE) {
+      updatedHistory[itemId].sellPrice.pop();
+    }
+  }
 
   try {
     await ShopStats.updateOne(
@@ -73,6 +92,7 @@ ShopStats.updateStats = async function(shopId: string, prices: { [itemId: string
       { 
         $set: { 
             price: prices, 
+            history: updatedHistory
         }
       }
     );

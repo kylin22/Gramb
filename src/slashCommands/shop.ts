@@ -7,6 +7,7 @@ import { PlayerStats } from "../schemas/PlayerStats";
 import Item from "../classes/Item";
 import itemsMap from "../config/items";
 import { Tier, Tiers } from "../classes/Tiers";
+import { Currencies, Prices } from "../classes/Currencies";
 
 const command : SlashCommand = {
     command: new SlashCommandBuilder()
@@ -51,20 +52,38 @@ const command : SlashCommand = {
             });
             activeResources = Tier.sortTiers(activeResources);
 
+            const averagePriceHistory = (currency: string, array: Prices[], index: number): number | undefined => {
+                if (array.length === 0) return undefined;
+                if (index <= 0 || index > array.length) return undefined;
+                const currencyKey = Currencies[currency as keyof typeof Currencies];
+                
+                const slice = array.slice(0, index);
+                const sum = slice.reduce((acc, curr) => acc + curr[currencyKey]!, 0);
+                return sum / index;
+            }
+
             let description = "";
             activeResources.forEach((item) => {
                 const emoji = Tier.tierEmoji[item.tier];
                 const prices = shopStats.price[item.id].sellPrice;
                 let priceDescription = "";
+                let fluctuationDescription = "";
                 //TODO implement multiple currencies
                 Object.entries(prices).forEach(([currency, price]) => {
+                    const AverageLastPrices = averagePriceHistory(currency, shopStats.history[item.id].sellPrice, 2);
+                    if (AverageLastPrices) {
+                        let percentageChange = ((price - AverageLastPrices) / AverageLastPrices).toFixed(3);
+                        console.log(percentageChange);
+                        percentageChange.startsWith("-") ? percentageChange : "+" + percentageChange;
+                        fluctuationDescription += `(${percentageChange}%)`
+                    }
                     priceDescription += `${price.toFixed(2)} ${currency}`;
                 });
-                description += `> ${emoji} **${item.name}** (${playerStats.resources[item.id]}): ${priceDescription}\n`
+                description += `> ${emoji} **${item.name}** (${playerStats.resources[item.id]}): ${priceDescription} ${fluctuationDescription}\n`
             });
             
             interaction.reply(
-                `## __Shop__\n\nWelcome to the Shop <@${interaction.member!.user.id}>\nuse /shop_sell to sell items\n### Sell >>>\n${description}`
+                `## __Shop__\n\nWelcome to the Shop <@${interaction.member!.user.id}>\nUse \`/shop_sell\` to sell items\n### Sell >>>\n${description}`
             );
         } catch (error) {
             console.error(`Failed to handle grank command: ${error.stack}`);

@@ -68,7 +68,7 @@ const command : SlashCommand = {
                 embeds: [
                     new EmbedBuilder()
                     .setTitle("Repayment")
-                    .setDescription(`<@${interaction.member!.user.id}> has repaid a loan of ${repayAmount}CP`)
+                    .setDescription(`<@${interaction.member!.user.id}> has repaid ${repayAmount} CP of their loan \n\n **New Balance**: ${playerStats.CP - repayAmount} CP`)
                     .setAuthor({ name: interaction.member!.user.username, iconURL: interaction.user.displayAvatarURL() })
                     .setImage(currentRegion.image) //TODO grank sprite
                     .setColor(getThemeColor("text"))
